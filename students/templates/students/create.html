@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>create</h1>
+<form method='POST' action={% url 'create' %} enctype="multipart/form-data">
+{% csrf_token %}
+First Name:
+<br />
+<input type="text" name="firstname" />
+<br />
+Middle Name
+<br />
+<input type="text" name="middlename" />
+<br />
+Last Name
+<br />
+<input type="text" name="lastname" />
+<br />
+Birth Date
+<br />
+<input type="date" name="birthdate" />
+<br />
+Email
+<br />
+<input type="text" name="email" />
+<br />
+<br />
+<input type="submit" value="Add" />
+</form>
+{% endblock %}
