@@ -1,4 +1,30 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>students homepage</h1>
+<body>
+<div>
+    <section class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+      <div class="container">
+        <h1 class="jumbotron-heading">Search Name</h1>
+      </div>
+    <form action={% url 'home' %} method="POST">
+      {% csrf_token %}
+        <input class="form-control form-control-dark w-100" type="text" name="name">
+        <br />
+        <input class="btn btn-primary my-2" type="submit" value="Search">
+        <a href={% url 'create' %} class="btn btn-secondary my-2">Add New</a>
+    </form>
+    </section>
+    <p />
+    {% if students %}
+            <ul>
+                {% for student in students %}
+                <li><a href="{{ student.get_absolute_url }}">{{ student.fullname }}</li>
+
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No record matched your search criteria.</p>
+        {% endif %}
+      </div>
+</body>
 {% endblock %}
