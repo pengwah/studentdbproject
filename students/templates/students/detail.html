@@ -7,6 +7,12 @@
 {% csrf_token %}
 
 <div class="row">
+  <div class="col-md-3 mb-3">
+  <input class="form-control" type="text" id="ID" name="id" value="{{ student.id }}" hidden/>
+  </div>
+</div>
+
+<div class="row">
   <div class="col-md-6 mb-3">
     <label for="firstName">First name</label>
     <input type="text" class="form-control" id="firstname" name="firstname" value="{{ student.firstname }}" required>
@@ -77,6 +83,6 @@
 </div>
 
 <br />
-<input class="class="btn btn-primary my-2"" type="submit" value="Save" />
+<input class="btn btn-primary my-2" type="submit" value="Save" />
 </form>
 {% endblock %}

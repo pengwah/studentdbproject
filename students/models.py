@@ -15,6 +15,10 @@ class student(models.Model):
     city = models.CharField(max_length=80, null=True, blank=True)
     zipcode = models.CharField(max_length=12, null=True, blank=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['fullname'], name='fullname_idx'),
+        ]
 
     def get_absolute_url(self):
         from django.urls import reverse

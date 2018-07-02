@@ -18,7 +18,7 @@
     {% if students %}
             <ul>
                 {% for student in students %}
-                <li><a href="{{ student.get_absolute_url }}">{{ student.fullname }}</li>
+                <li class="nav-item"><a href="{{ student.get_absolute_url }}">{{ student.fullname }}</li>
 
                 {% endfor %}
             </ul>

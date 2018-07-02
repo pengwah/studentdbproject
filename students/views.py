@@ -11,6 +11,8 @@ def home(request):
             searchname = request.POST['name']
             students = student.objects.filter(fullname__icontains=searchname)
             return render(request, 'students/home.html', {'students': students})
+        else:
+            return render(request, 'students/home.html')
     else:
         return render(request, 'students/home.html')
 
@@ -18,9 +20,11 @@ def home(request):
 def create(request):
     if request.method == 'POST':
         if request.POST['firstname'] and request.POST['lastname'] and request.POST['birthdate'] and request.POST['email'] :
-            Student = student()
+            if request.POST['id']:
+              Student = get_object_or_404(student, pk=request.POST['id'])
+            else:
+                Student = student()
             Student.firstname = request.POST['firstname']
-#            Student.middlename = request.POST['middlename']
             Student.lastname = request.POST['lastname']
             Student.birthdate = request.POST['birthdate']
             Student.email = request.POST['email']
@@ -41,22 +45,4 @@ def create(request):
 @login_required
 def detail(request, student_id):
     Student = get_object_or_404(student, pk=student_id)
-    if request.method == 'POST':
-        if request.POST['firstname'] and request.POST['lastname'] and request.POST['birthdate'] and request.POST['email'] :
-            Student.firstname = request.POST['firstname']
-#            Student.middlename = request.POST['middlename']
-            Student.lastname = request.POST['lastname']
-            Student.birthdate = request.POST['birthdate']
-            Student.email = request.POST['email']
-            Student.phone1 = request.POST['phone1']
-            Student.phone2 = request.POST['phone2']
-            Student.fullname = Student.firstname + " " + Student.lastname
-            Student.street = request.POST['street']
-            Student.city = request.POST['city']
-            Student.zipcode = request.POST['zipcode']
-            Student.save()
-            return redirect('/students/' + str(Student.id))
-        else:
-          return render(request, 'students/create',{'error':'All fields are requied'})
-    else:
-        return render(request, 'students/detail.html',{'student':Student})
+    return render(request, 'students/detail.html',{'student':Student})
