@@ -10,8 +10,44 @@
       {% csrf_token %}
         <input class="form-control form-control-dark w-100" type="text" name="name">
         <br />
+
+
         <input class="btn btn-primary my-2" type="submit" value="Search">
         <a href={% url 'create' %} class="btn btn-secondary my-2">Add New</a>
+        <button class="btn btn-secondary my-2" type="button" data-toggle="collapse" data-target="#advancesearch" aria-expanded="false" aria-controls="dvancesearch">
+          Advanced Search
+        </button>
+        <div class="collapse" id="advancesearch">
+          <div class="card card-body">
+            <table class="table table-borderless">
+              <tr>
+                <td>
+            <select class="custom-select d-block w-100" name="instrument" id="instrument">
+              <option value="">Select Instrument</option>
+              {% for instrument in instruments %}
+              <option value = {{instrument.id}}>{{instrument.instrument}}</option>
+              {% endfor %}
+              <div class="invalid-feedback">
+                Please select instrument.
+              </div>
+            </select>
+          </td>
+
+              <td>
+            <select class="custom-select d-block w-100" name="instructor" id="instructor">
+              <option value="">Select Instructor</option>
+              {% for instructor in instructors %}
+              <option value = {{instructor.id}}>{{instructor.name}}</option>
+              {% endfor %}
+              <div class="invalid-feedback">
+                Please select instructor.
+              </div>
+            </select>
+          </td>
+        </tr>
+          </table>
+          </div>
+        </div>
     </form>
     </section>
     <p />
