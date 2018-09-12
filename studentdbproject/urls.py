@@ -26,6 +26,7 @@ urlpatterns = [
     path('students/create', students.views.create, name='create'),
     path('students/home', students.views.home, name='home'),
     path('students/<int:student_id>', students.views.detail, name='detail'),
+    path('refresh', students.views.refresh, name='refresh'),
     path('students/delitem', students.views.delinstrument, name='delitem'),
     path('students/additem', students.views.addinstrument, name='additem'),
 ]

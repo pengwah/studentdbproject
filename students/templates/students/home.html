@@ -1,20 +1,87 @@
 {% extends 'base.html' %}
 {% block content %}
+<script>
+$(document).ready(function(){
+  // $('#searchstring').keyup(function(){
+  //   clearTimeout($.data(this, 'timer'));
+  //   var wait = setTimeout(search, 300);
+  //   $(this).data('timer', wait);
+  // })
+  $("#submit").submit(function(event){
+    search();
+    event.preventDefault();
+  })
+});
+function search(){
+  $('#result').empty();
+  $.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+      function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+        // Only send the token to relative URLs i.e. locally.
+        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+      }
+    }
+  });
+
+  if (($('#searchstring').val())){
+    var formData = {
+      'searchstring'        : $('#searchstring').val(),
+      'instrument'          : $('#instrument').val(),
+      'instructor'          : $('#instructor').val(),
+    };
+    console.log(formData);
+    $.ajax({
+      type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+      url         : '{% url 'students' %}', // the url where we want to POST
+      data        : formData, // our data object
+      dataType    : 'json', // what type of data do we expect back from the server
+      encode       : true,
+      success: function (data) {
+         if (data) {
+           $('#result').empty();
+           var jsonparsed = JSON.parse(data[0].student);
+           var i;
+           var str;
+           for(i = 0; i < jsonparsed.length; i++) {
+            str = '<li class="nav-item" id="item"><a href="' + data[0].studenturl[i] + '">' + jsonparsed[i].fields.fullname + '</li>';
+            $('#result').append(str);
+          }
+
+         }},
+    })
+  }
+}
+</script>
 <body>
+
 <div>
     <section class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
       <div class="container">
         <h1 class="jumbotron-heading">Search Name</h1>
       </div>
-    <form action={% url 'home' %} method="POST">
+    <form action={% url 'home' %} method="POST"  id="submit" autocomplete="off" >
       {% csrf_token %}
-        <input class="form-control form-control-dark w-100" type="text" name="name">
+        <input class="form-control form-control-dark w-100" id="searchstring" type="text" name="searchstring" autocomplete=off >
         <br />
-
 
         <input class="btn btn-primary my-2" type="submit" value="Search">
         <a href={% url 'create' %} class="btn btn-secondary my-2">Add New</a>
-        <button class="btn btn-secondary my-2" type="button" data-toggle="collapse" data-target="#advancesearch" aria-expanded="false" aria-controls="dvancesearch">
+        <button class="btn btn-secondary my-2" type="button" data-toggle="collapse" data-target="#advancesearch" aria-expanded="true" aria-controls="advancesearch">
           Advanced Search
         </button>
         <div class="collapse" id="advancesearch">
@@ -51,16 +118,17 @@
     </form>
     </section>
     <p />
-    {% if students %}
+    <div id="result">
+      {% if students %}
             <ul>
                 {% for student in students %}
                 <li class="nav-item"><a href="{{ student.get_absolute_url }}">{{ student.fullname }}</li>
-
                 {% endfor %}
             </ul>
         {% else %}
             <p>No record matched your search criteria.</p>
         {% endif %}
-      </div>
+        </div>
+    </div>
 </body>
 {% endblock %}

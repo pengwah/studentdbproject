@@ -1,21 +1,153 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% load staticfiles %}
 <h1>Student Information</h1>
+<script>
+  $(document).ready(function(){
+    if($("#edit").val() == "Cancel"){
+      $("#save").removeAttr("hidden");
+    }
+    else{
+      $("#save").attr("hidden", "hidden");
+    }
 
-<form class="needs-validation" method='POST' action={% url 'create' %} enctype="multipart/form-data">
+    $('#edit').on('click',function(){
+      refreshform();
+      if($(".form-control").attr("disabled") == "disabled"){
+        $(".form-control").removeAttr("disabled");
+        $("#edit").val("Cancel");
+        $("#save").removeAttr("hidden");
+      }
+      else{
+        $(".form-control").attr("disabled", "disabled");
+        $("#edit").val("Edit");
+        $("#save").attr("hidden", "hidden");
+      }
+    });
+
+    $("#submit").submit(function(event){
+      var formData = {
+        'id'        : $('#id').val(),
+        'firstname' : $('#firstname').val(),
+        'lastname'  : $('#lastname').val(),
+        'birthdate' : $('#birthdate').val(),
+        'email'     : $('#email').val(),
+        'email2'    : $('#email2').val(),
+        'phone1'    : $('#phone1').val(),
+        'phone2'    : $('#phone2').val(),
+        'street'   : $('#street').val(),
+        'city'      : $('#city').val(),
+        'zipcode'   : $('#zipcode').val(),
+      };
+
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+              var cookies = document.cookie.split(';');
+              for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+                }
+              }
+            }
+            return cookieValue;
+          }
+          if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+            // Only send the token to relative URLs i.e. locally.
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+          }
+        }
+      });
+
+      $.ajax({
+        type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+        url         : '{% url 'create' %}', // the url where we want to POST
+        data        : formData, // our data object
+        dataType    : 'json', // what type of data do we expect back from the server
+        encode       : true,
+        success: function (data) {
+           if (data) {
+             refreshform();
+             $(".form-control").attr("disabled", "disabled");
+             $("#edit").val("Edit");
+             $("#save").attr("hidden", "hidden");
+           }},
+      });
+      event.preventDefault();
+    });
+  })
+
+  function refreshform(){
+    var formData = {
+      'id'        : $('#id').val(),
+    };
+    $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+        function getCookie(name) {
+          var cookieValue = null;
+          if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+              var cookie = jQuery.trim(cookies[i]);
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+        if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+          // Only send the token to relative URLs i.e. locally.
+          xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+        }
+      }
+    });
+    $.ajax({
+      type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+      url         : '{% url 'refresh' %}', // the url where we want to POST
+      data        : formData, // our data object
+      dataType    : 'json', // what type of data do we expect back from the server
+      encode       : true,
+
+      success: function (data) {
+         if (data) {
+           var jsonparsed = JSON.parse(data[0].student)[0].fields;
+           $('#firstname').val(jsonparsed.firstname);
+           $('#lastname').val(jsonparsed.lastname);
+           $('#birthdate').val(jsonparsed.birthdate);
+           $('#email').val(jsonparsed.email);
+           $('#email2').val(jsonparsed.email2);
+           $('#phone1').val(jsonparsed.phone1);
+           $('#phone2').val(jsonparsed.phone2);
+           $('#street').val(jsonparsed.street);
+           $('#city').val(jsonparsed.city);
+           $('#zipcode').val(jsonparsed.zipcode);
+         }},
+    });
+  }
+</script>
+
+<form class="needs-validation" method='POST' action={% url 'create' %} id="submit" enctype="multipart/form-data">
 {% csrf_token %}
 
 <div class="row">
   <div class="col-md-3 mb-3">
-  <input class="form-control" type="text" id="ID" name="id" value="{{ student.id }}" hidden/>
+  <input class="form-control" type="text" id="id" name="id" value="{{ student.id }}" hidden disabled/>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-6 mb-3">
     <label for="firstName">First name</label>
-    <input type="text" class="form-control" id="firstname" name="firstname" value="{{ student.firstname }}" required>
+    <input type="text" class="form-control" id="firstname" name="firstname" value="{{ student.firstname }}" required disabled />
     <div class="invalid-feedback">
       Valid first name is required.
     </div>
@@ -23,7 +155,7 @@
 
   <div class="col-md-6 mb-3">
     <label for="lastName">Last name</label>
-    <input type="text" class="form-control" id="lastname" name="lastname" placeholder="" value="{{ student.lastname }}" required>
+    <input type="text" class="form-control" id="lastname" name="lastname" placeholder="" value="{{ student.lastname }}" required disabled />
     <div class="invalid-feedback">
       Valid last name is required.
     </div>
@@ -32,13 +164,13 @@
 <div class="row">
   <div class="col-md-3 mb-3">
     <label for="birthdate">Birth Date</label>
-    <input class="form-control" type="date" id="birthdate" name="birthdate" value="{{ student.birthdate|date:'Y-m-d' }}" />
+    <input class="form-control" type="date" id="birthdate" name="birthdate" value="{{ student.birthdate|date:'Y-m-d' }}" disabled />
   </div>
 </div>
 <div class="row">
   <div class=col-md-6 mb-3">
     <label for="email">Email</label>
-    <input class="form-control" type="text" id="email" name="email" placeholder="you@example.com" value="{{ student.email }}" required />
+    <input class="form-control" type="text" id="email" name="email" placeholder="you@example.com" value="{{ student.email }}" required disabled />
     <a href="mailto:{{ student.email }}">Send Email</a>
     <div class="invalid-feedback">
       Email is required.
@@ -47,7 +179,7 @@
 
   <div class=col-md-6 mb-3">
     <label for="email2">Secondary Email</label>
-    <input class="form-control" type="text" id="email2" name="email2" placeholder="you@example.com" value="{{ student.email2 }}" />
+    <input class="form-control" type="text" id="email2" name="email2" placeholder="you@example.com" value="{{ student.email2 }}" disabled />
     <a href="mailto:{{ student.email2 }}">Send Email</a>
   </div>
 </div>
@@ -55,20 +187,20 @@
 <div class="row">
   <div class="col-md-6 mb-3">
     <label for="phone1">Primary Phone Number</label>
-    <input type="text" class="form-control" id="phone1" name="phone1" placeholder="" value="{{ student.phone1 }}" required>
+    <input type="text" class="form-control" id="phone1" name="phone1" placeholder="" value="{{ student.phone1 }}" required disabled />
     <div class="invalid-feedback">
       Valid first name is required.
     </div>
   </div>
   <div class="col-md-6 mb-3">
     <label for="phone2">Secondary Phone Number</label>
-    <input type="text" class="form-control" id="phone2" name="phone2" placeholder="" value="{{ student.phone2 }}">
+    <input type="text" class="form-control" id="phone2" name="phone2" placeholder="" value="{{ student.phone2 }}" disabled />
   </div>
 </div>
 
 <div class="mb-3">
   <label for="address">Address</label>
-  <input type="text" class="form-control" id="address" name="street" placeholder="1234 Main St" value="{{ student.street }}" required>
+  <input type="text" class="form-control" id="street" name="street" placeholder="1234 Main St" value="{{ student.street }}" required disabled />
   <div class="invalid-feedback">
     Please enter your  address.
   </div>
@@ -76,7 +208,7 @@
 
 <div class="mb-3">
   <label for="city">City</label>
-  <input type="text" class="form-control" id="city" name="city" value="{{ student.city }}" required>
+  <input type="text" class="form-control" id="city" name="city" value="{{ student.city }}" required disabled />
   <div class="invalid-feedback">
     Please enter your city.
   </div>
@@ -85,13 +217,14 @@
 <div class="row">
 <div class="col-md-3 mb-3">
   <label for="zipcode">Zip</label>
-  <input type="text" class="form-control" id="zipcode" name="zipcode" value="{{ student.zipcode }}" required>
+  <input type="text" class="form-control" id="zipcode" name="zipcode" value="{{ student.zipcode }}" required disabled />
   <div class="invalid-feedback">
     Please enter your Zip.
   </div>
 </div>
 </div>
-<input class="btn btn-primary my-2" type="submit" value="Save" />
+<input class="btn btn-primary my-2" id="save" type="submit" value="Save" hidden />
+<input class="btn btn-primary my-2" id="edit" type="button" value="Edit" />
 </form>
 <p />
 
