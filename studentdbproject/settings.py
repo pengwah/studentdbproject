@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.pa Sth.abspath(__file__)))
 
 
 # Quick-start development settings - unsuitable for production
@@ -133,3 +133,8 @@ LOGIN_REDIRECT_URL = '/'
 
 SESSION_COOKIE_AGE = 3600
 SESSION_SAVE_EVERY_REQUEST = True
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
