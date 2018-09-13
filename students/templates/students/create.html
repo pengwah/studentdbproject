@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
+
+<script>
+$( function() {
+  $( "#birthdate" ).datepicker({ dateFormat: 'yy-mm-dd' });
+} );
+</script>
 <h1>Student Information (Create)</h1>
 <form class="needs-validation" method='POST' action={% url 'create' %} enctype="multipart/form-data">
 {% csrf_token %}

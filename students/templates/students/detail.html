@@ -134,6 +134,11 @@
     });
   }
 </script>
+<script>
+$( function() {
+  $( "#birthdate" ).datepicker({ dateFormat: 'yy-mm-dd' });
+} );
+</script>
 
 <form class="needs-validation" method='POST' action={% url 'create' %} id="submit" enctype="multipart/form-data">
 {% csrf_token %}
