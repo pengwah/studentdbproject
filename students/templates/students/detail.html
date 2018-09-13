@@ -193,7 +193,7 @@ $( function() {
   <div class="col-md-6 mb-3">
     <label for="phone1">Primary Phone Number</label>
     <input type="text" class="form-control" id="phone1" name="phone1" placeholder="" value="{{ student.phone1 }}" required disabled />
-    <a href="tel:{{ student.phone1 }}">Send Email</a>
+    <a href="tel:{{ student.phone1 }}">Call</a>
     <div class="invalid-feedback">
       Valid first name is required.
     </div>
@@ -201,6 +201,7 @@ $( function() {
   <div class="col-md-6 mb-3">
     <label for="phone2">Secondary Phone Number</label>
     <input type="text" class="form-control" id="phone2" name="phone2" placeholder="" value="{{ student.phone2 }}" disabled />
+    <a href="tel:{{ student.phone1 }}">Call</a>
   </div>
 </div>
 
